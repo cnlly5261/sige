@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sige — 息止屏幕，界守双眼</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#070710;--s:#0d0d1c;--b:#1a1a30;--t:#e8e8f4;--m:#686894;
+  --a:#5b6ef5;--ag:rgba(91,110,245,.18);--r:14px;--w:1024px
+}
+
+body{
+  font-family:-apple-system,'SF Pro Display','Inter',system-ui,sans-serif;
+  background:var(--bg);color:var(--t);line-height:1.55;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased
+}
+.mono{font-family:'SF Mono',monospace;font-size:.82em}
+h2{font-size:26px;font-weight:700;letter-spacing:-.02em}
+
+nav{
+  position:fixed;inset:0 0 auto;z-index:100;
+  background:rgba(7,7,16,.78);backdrop-filter:blur(24px) saturate(2);
+  border-bottom:1px solid rgba(255,255,255,.06)
+}
+nav .in{max-width:var(--w);margin:0 auto;padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between}
+nav .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}
+nav .logo i{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#5b6ef5,#8b5cf6);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:14px}
+nav .nr{display:flex;align-items:center;gap:4px}
+nav .nr a{color:var(--m);text-decoration:none;font-size:13px;font-weight:500;padding:6px 12px;border-radius:8px;transition:all .2s}
+nav .nr a:hover{color:var(--t);background:rgba(255,255,255,.04)}
+nav .nr .lg{display:flex;align-items:center;margin-left:10px;border:1px solid var(--b);border-radius:20px;overflow:hidden;font-size:12px;font-weight:600}
+nav .nr .lg span{cursor:pointer;padding:5px 14px;color:var(--m);transition:all .2s}
+nav .nr .lg span.on{color:var(--a);background:rgba(91,110,245,.08)}
+nav .nr .lg b{display:inline-block;width:1px;height:16px;background:var(--b)}
+
+.hero{
+  min-height:90vh;display:flex;align-items:center;justify-content:center;
+  padding:120px 24px 80px;text-align:center;position:relative;overflow:hidden
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(rgba(91,110,245,.1) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:1
+}
+.hero::after{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(91,110,245,.14) 0%,rgba(139,92,246,.06) 35%,transparent 72%);
+  pointer-events:none;z-index:1
+}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+.hero>div{position:relative;z-index:2;max-width:680px}
+.hero .tag{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 16px;
+  border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.04em;
+  border:1px solid rgba(91,110,245,.3);color:var(--a);margin-bottom:28px;
+  background:rgba(91,110,245,.06)
+}
+.hero .tag .dot{width:6px;height:6px;border-radius:50%;background:var(--a);animation:pls 2s ease-in-out infinite}
+@keyframes pls{0%,100%{opacity:1}50%{opacity:.3}}
+.hero .slogan{font-size:clamp(18px,3vw,26px);color:var(--m);margin-bottom:6px;letter-spacing:.04em}
+.hero h1{font-size:clamp(34px,6.5vw,60px);font-weight:800;line-height:1.08;margin-bottom:10px}
+.hero h1 .hl{background:linear-gradient(135deg,#5b6ef5,#a78bfa,#6ee7b7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero .desc{font-size:15px;color:var(--m);max-width:460px;margin:18px auto 36px;opacity:.82}
+.hero .nums{display:flex;gap:32px;justify-content:center;margin-bottom:44px;flex-wrap:wrap}
+.hero .nums .st{text-align:center}
+.hero .nums .st .n{font-size:22px;font-weight:700;color:var(--t)}
+.hero .nums .st .l{font-size:11px;color:var(--m);margin-top:2px;letter-spacing:.06em;text-transform:uppercase}
+.hero .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:10px;font-size:15px;font-weight:600;text-decoration:none;transition:all .25s;cursor:pointer;border:none}
+.btn-p{background:var(--a);color:#fff}
+.btn-p:hover{background:#6d7ff7;transform:translateY(-1px);box-shadow:0 12px 32px rgba(91,110,245,.35)}
+.btn-o{background:transparent;color:var(--t);border:1.5px solid var(--b)}
+.btn-o:hover{border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.03)}
+
+.sec{max-width:var(--w);margin:0 auto 100px;padding:0 24px}
+.sec .sub{color:var(--m);font-size:15px;margin-bottom:40px}
+
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;border-radius:var(--r);overflow:hidden;border:1px solid var(--b)}
+.g2 .cl{background:var(--s);padding:34px 32px;transition:background .3s}
+.g2 .cl:hover{background:#101020}
+.g2 .cl .ix{font-size:11px;color:var(--m);margin-bottom:10px;font-weight:600;letter-spacing:.06em}
+.g2 .cl h3{font-size:16px;font-weight:600;margin-bottom:6px}
+.g2 .cl p{font-size:13px;color:var(--m);line-height:1.55}
+
+.mk{background:var(--s);border:1px solid var(--b);border-radius:var(--r);overflow:hidden;margin-top:24px}
+.mk .tb{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#121224;border-bottom:1px solid var(--b)}
+.mk .tb .d{width:10px;height:10px;border-radius:50%}
+.mk .tb .d:nth-child(1){background:#ff5f57}.mk .tb .d:nth-child(2){background:#febc2e}.mk .tb .d:nth-child(3){background:#28c840}
+.mk .tb span{font-size:12px;color:var(--m);margin-left:4px}
+.mk .inr{display:grid;grid-template-columns:200px 1fr;min-height:320px}
+.mk .sb{padding:14px;border-right:1px solid var(--b)}
+.mk .sb .it{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;font-size:12px;color:var(--m);margin-bottom:3px}
+.mk .sb .it.on{background:rgba(91,110,245,.12);color:var(--a);font-weight:600}
+.mk .mn{padding:20px}
+.mk .mn .rw{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px}
+.mk .mn .rw label{color:var(--m)}
+.mk .mn .tg{width:32px;height:18px;background:var(--a);border-radius:9px;position:relative}
+.mk .mn .tg::after{content:'';position:absolute;top:2px;right:2px;width:14px;height:14px;background:#fff;border-radius:50%}
+
+.sbar{display:flex;flex-wrap:wrap;gap:8px}
+.sbar span{padding:8px 18px;border-radius:20px;border:1px solid var(--b);font-size:12px;color:var(--m);transition:all .2s}
+.sbar span:hover{border-color:var(--a);color:var(--t);background:rgba(91,110,245,.04)}
+
+.dl{
+  border-radius:var(--r);border:1px solid rgba(91,110,245,.16);
+  background:linear-gradient(135deg,rgba(91,110,245,.05),rgba(139,92,246,.04));
+  padding:48px;text-align:center
+}
+.dl h2{font-size:24px;margin-bottom:16px}
+.dl .meta{display:flex;justify-content:center;gap:36px;margin-top:28px;flex-wrap:wrap}
+.dl .meta .mi{font-size:12px;color:var(--m)}
+.dl .meta .mi b{display:block;font-size:15px;color:var(--t);margin-bottom:3px;font-weight:600}
+.dl .sum{font-size:11px;color:var(--m);word-break:break-all;margin-top:20px}
+
+footer{text-align:center;padding:36px 24px;color:var(--m);font-size:12px;border-top:1px solid var(--b);letter-spacing:.03em}
+footer a{color:var(--a);text-decoration:none}
+
+@media(max-width:720px){
+  .g2{grid-template-columns:1fr}
+  .mk .inr{grid-template-columns:1fr}
+  .mk .sb{display:none}
+  .hero h1{font-size:30px}
+  .hero .slogan{font-size:18px}
+  nav .nr a{display:none}
+  .dl{padding:32px 20px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="in">
+    <div class="logo"><i>☕</i> Sige</div>
+    <div class="nr">
+      <a href="#features" id="lnk-feat">功能</a>
+      <a href="#sounds" id="lnk-sound">音效</a>
+      <a href="#download" id="lnk-dl">下载</a>
+      <div class="lg">
+        <span class="on" id="lzh" onclick="S('zh')">中文</span>
+        <b></b>
+        <span id="len" onclick="S('en')">EN</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <canvas id="hc"></canvas>
+  <div>
+    <div class="tag"><div class="dot"></div><span id="t-tag">新版本发布</span> · v1.1</div>
+    <p class="slogan" id="t-sl">息止屏幕，界守双眼</p>
+    <h1><span id="t-ti">Sige</span> <span class="hl" id="t-su">休息提醒</span></h1>
+    <p class="desc" id="t-de">为 Mac 打造的极简休息提醒助手，帮你暂停屏幕，放松双眼。</p>
+    <div class="nums">
+      <div class="st"><div class="n">2.1 MB</div><div class="l">Package</div></div>
+      <div class="st"><div class="n">0</div><div class="l">Dependencies</div></div>
+      <div class="st"><div class="n">macOS 14+</div><div class="l">Required</div></div>
+    </div>
+    <div class="btns">
+      <a href="Sige-1.1.dmg" class="btn btn-p" download>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span id="t-dl">下载 macOS 版</span>
+      </a>
+      <a href="#features" class="btn btn-o" id="t-mo">了解更多</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="features">
+  <h2 id="t-s1">功能特性</h2>
+  <p class="sub" id="t-s1s">轻量 · 原生 · 隐私优先</p>
+  <div class="g2">
+    <div class="cl"><div class="ix mono">01</div><h3 id="t-f1t">智能定时</h3><p id="t-f1d">支持间隔模式与时间点模式。工作时长 1–120 分钟、休息时长 1–30 分钟，灵活适配不同工作节奏。</p></div>
+    <div class="cl"><div class="ix mono">02</div><h3 id="t-f2t">全屏休息界面</h3><p id="t-f2d">自定义渐变背景、字体、颜色、进度环，打造沉浸式休息体验。</p></div>
+    <div class="cl"><div class="ix mono">03</div><h3 id="t-f3t">8 种内置音效</h3><p id="t-f3d">基于 Roland GS 音色库 + 大厅混响。钢琴、竖琴、长笛、八音盒……</p></div>
+    <div class="cl"><div class="ix mono">04</div><h3 id="t-f4t">暗色/浅色适配</h3><p id="t-f4d">菜单栏纯色 SF Symbol 图标，自动跟随系统外观。</p></div>
+    <div class="cl"><div class="ix mono">05</div><h3 id="t-f5t">菜单栏常驻</h3><p id="t-f5d">纯菜单栏应用，不占 Dock 位。支持倒计时显示/隐藏、一键暂停。</p></div>
+    <div class="cl"><div class="ix mono">06</div><h3 id="t-f6t">统计 & 目标</h3><p id="t-f6d">每日休息次数与时长追踪，可视化目标进度环。</p></div>
+    <div class="cl"><div class="ix mono">07</div><h3 id="t-f7t">中英文切换</h3><p id="t-f7d">完整本地化——菜单、设置、休息界面全覆盖。</p></div>
+    <div class="cl"><div class="ix mono">08</div><h3 id="t-f8t">下载安装</h3><p id="t-f8d">DMG 安装包，拖入 Applications 即可使用，开机自启可选。</p></div>
+  </div>
+</section>
+
+<section class="sec" id="sounds">
+  <h2 id="t-s2">音效列表</h2>
+  <p class="sub" id="t-s2s">全部基于 macOS 内置乐器实时合成，无需额外文件。</p>
+  <div class="sbar">
+    <span>🎹 空灵钢琴</span><span>🌅 温暖铺底</span><span>🪈 竖琴流水</span><span>🎵 长笛冥想</span>
+    <span>🎼 八音盒</span><span>🔮 水晶铃音</span><span>🎸 木吉他</span><span>🎻 温暖弦乐</span>
+  </div>
+</section>
+
+<section class="sec">
+  <h2 id="t-s3">设置面板预览</h2>
+  <div class="mk">
+    <div class="tb"><div class="d"></div><div class="d"></div><div class="d"></div><span>Sige</span></div>
+    <div class="inr">
+      <div class="sb">
+        <div class="it on">⏱ <span id="t-m1">定时</span></div>
+        <div class="it">🎨 <span id="t-m2">外观</span></div>
+        <div class="it">⚙ <span id="t-m3">通用</span></div>
+        <div class="it">📊 <span id="t-m4">统计</span></div>
+      </div>
+      <div class="mn">
+        <div class="rw"><label>Mode</label><span style="color:var(--a)">● Interval ○ Time Points</span></div>
+        <div class="rw"><label>Work interval</label><span>45 min</span></div>
+        <div class="rw"><label>Break duration</label><span>5 min</span></div>
+        <div class="rw"><label>Pre-reminder</label><div class="tg"></div></div>
+        <div class="rw"><label>Background</label><span>Gradient</span></div>
+        <div class="rw"><label>Sound</label><span>🎹 Piano</span></div>
+        <div class="rw"><label>Language</label><span>中文</span></div>
+        <div class="rw"><label>Launch at login</label><div class="tg"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="download">
+  <div class="dl">
+    <h2 id="t-dlt">下载 Sige</h2>
+    <p style="font-size:14px;color:var(--m);margin-bottom:26px" id="t-dlv">v1.1 · macOS 14.0 Sonoma 及以上 · 免费使用</p>
+    <a href="Sige-1.1.dmg" class="btn btn-p" download>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span id="t-dlb">下载 Sige-1.1.dmg</span>
+    </a>
+    <div class="meta">
+      <div class="mi"><b>2.1 MB</b><span id="t-dls">安装包大小</span></div>
+      <div class="mi"><b>macOS 14+</b><span id="t-dlo">系统要求</span></div>
+      <div class="mi"><b>Universal</b><span id="t-dlc">Apple Silicon</span> &amp; <span id="t-dli">Intel</span></div>
+    </div>
+    <div class="sum"><span id="t-sum">DMG 校验</span>: <code class="mono">36b28de54b0e2995add3094cc2325ed2bb02f76d2e52a8a34eea3b0552062a19</code></div>
+  </div>
+</section>
+
+<footer>
+  <p>Sige &middot; Break Reminder for Mac &middot; Built with SwiftUI &amp; AppKit</p>
+  <p style="margin-top:4px"><a href="mailto:caoruihua@gmail.com">contact: caoruihua@gmail.com</a></p>
+</footer>
+
+<!-- Particle animation -->
+<script>
+(function(){
+var c=document.getElementById('hc');
+if(!c)return;
+var ctx=c.getContext('2d'),w=0,h=0,t=0,P=[],L=[];
+function R(){w=window.innerWidth;h=window.innerHeight;c.width=w;c.height=h}
+R();window.addEventListener('resize',R);
+
+for(var i=0;i<8;i++){var ag=Math.random()*Math.PI*2;
+  P.push({rx:140+Math.random()*240,ry:80+Math.random()*160,ag:ag,sp:.004+Math.random()*.007,r:2.5+Math.random()*3,o:.3+Math.random()*.4,h:210+Math.random()*60});
+}
+for(var i=0;i<50;i++){L.push({bx:Math.random()*w,by:Math.random()*h,ax:25+Math.random()*90,ay:18+Math.random()*65,ph:Math.random()*Math.PI*2,r:.5+Math.random()*1.4,o:.12+Math.random()*.25,h:190+Math.random()*90});
+}
+
+function hsla(h,s,l,a){s=s/100;l=l/100;var k=function(n){return(n+h/30)%12};var a2=s*Math.min(l,1-l);var f=function(n){return l-a2*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)))};return'rgba('+Math.round(255*f(0))+','+Math.round(255*f(8))+','+Math.round(255*f(4))+','+a+')';}
+
+function A(){
+  ctx.clearRect(0,0,w,h);t=t+.016;
+  var mx=w/2,my=h/2;
+  for(var i=0;i<P.length;i++){var p=P[i];p.ag=p.ag+p.sp;
+    var px=mx+Math.cos(p.ag)*p.rx,py=my+Math.sin(p.ag)*p.ry;
+    var g=ctx.createRadialGradient(px,py,0,px,py,p.r*14);
+    g.addColorStop(0,hsla(p.h,90,70,p.o));g.addColorStop(.3,hsla(p.h,80,50,p.o*.6));g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(px,py,p.r*14,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=hsla(p.h,30,95,p.o*1.3);ctx.beginPath();ctx.arc(px,py,p.r*.5,0,Math.PI*2);ctx.fill();
+  }
+  for(var i=0;i<L.length;i++){var l=L[i];l.ph=l.ph+.007;
+    var lx=l.bx+Math.sin(l.ph)*l.ax,ly=l.by+Math.cos(l.ph*1.4)*l.ay*.6;
+    var g=ctx.createRadialGradient(lx,ly,0,lx,ly,l.r*6);
+    g.addColorStop(0,hsla(l.h,70,65,l.o));g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(lx,ly,l.r*6,0,Math.PI*2);ctx.fill();
+    for(var j=i+1;j<L.length;j++){var m=L[j];
+      var mx2=m.bx+Math.sin(m.ph)*m.ax,my2=m.by+Math.cos(m.ph*1.4)*m.ay*.6;
+      var dx=lx-mx2,dy=ly-my2,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<110){ctx.strokeStyle=hsla(230,70,65,(1-dist/110)*.06);ctx.lineWidth=.35;ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(mx2,my2);ctx.stroke();}
+    }
+  }
+  var pr=130+Math.sin(t*.75)*35;
+  ctx.beginPath();ctx.arc(mx,my,pr,0,Math.PI*2);ctx.strokeStyle=hsla(250,60,60,.05);ctx.lineWidth=1;ctx.stroke();
+  ctx.beginPath();ctx.arc(mx,my,pr*.65,0,Math.PI*2);ctx.strokeStyle=hsla(190,70,65,.03);ctx.lineWidth=.7;ctx.stroke();
+  requestAnimationFrame(A);
+}
+A();
+})();
+</script>
+
+<!-- i18n -->
+<script>
+var D={
+zh:{
+  'lnk-feat':'功能','lnk-sound':'音效','lnk-dl':'下载',
+  't-tag':'新版本发布','t-sl':'息止屏幕，界守双眼','t-ti':'Sige','t-su':'休息提醒',
+  't-de':'为 Mac 打造的极简休息提醒助手，帮你暂停屏幕，放松双眼。',
+  't-dl':'下载 macOS 版','t-mo':'了解更多',
+  't-s1':'功能特性','t-s1s':'轻量 · 原生 · 隐私优先',
+  't-f1t':'智能定时','t-f1d':'支持间隔模式与时间点模式。工作时长 1–120 分钟、休息时长 1–30 分钟，灵活适配不同工作节奏。',
+  't-f2t':'全屏休息界面','t-f2d':'自定义渐变背景、字体、颜色、进度环，打造沉浸式休息体验。',
+  't-f3t':'8 种内置音效','t-f3d':'基于 Roland GS 音色库 + 大厅混响。钢琴、竖琴、长笛、八音盒……',
+  't-f4t':'暗色/浅色适配','t-f4d':'菜单栏纯色 SF Symbol 图标，自动跟随系统外观。',
+  't-f5t':'菜单栏常驻','t-f5d':'纯菜单栏应用，不占 Dock 位。支持倒计时显示/隐藏、一键暂停。',
+  't-f6t':'统计 & 目标','t-f6d':'每日休息次数与时长追踪，可视化目标进度环。',
+  't-f7t':'中英文切换','t-f7d':'完整本地化——菜单、设置、休息界面全覆盖。',
+  't-f8t':'下载安装','t-f8d':'DMG 安装包，拖入 Applications 即可使用，开机自启可选。',
+  't-s2':'音效列表','t-s2s':'全部基于 macOS 内置乐器实时合成，无需额外文件。',
+  't-s3':'设置面板预览',
+  't-m1':'定时','t-m2':'外观','t-m3':'通用','t-m4':'统计',
+  't-dlt':'下载 Sige','t-dlv':'v1.1 · macOS 14.0 Sonoma 及以上 · 免费使用',
+  't-dlb':'下载 Sige-1.1.dmg',
+  't-dls':'安装包大小','t-dlo':'系统要求','t-dlc':'Apple Silicon','t-dli':'Intel',
+  't-sum':'DMG 校验',
+},
+en:{
+  'lnk-feat':'Features','lnk-sound':'Sounds','lnk-dl':'Download',
+  't-tag':'New Release','t-sl':'Rest the screen. Shield the eyes.','t-ti':'Sige','t-su':'Screen Break Timer',
+  't-de':'A minimalist break reminder for Mac. Pause the screen, rest your eyes.',
+  't-dl':'Download for macOS','t-mo':'Learn more',
+  't-s1':'Features','t-s1s':'Lightweight · Native · Privacy-first',
+  't-f1t':'Smart Scheduling','t-f1d':'Interval mode or fixed time points. Work 1–120 min, break 1–30 min — flexible rhythms for any workflow.',
+  't-f2t':'Full-screen Break UI','t-f2d':'Custom gradients, fonts, colors, and a progress ring. Make each break your own.',
+  't-f3t':'8 Built-in Soundscapes','t-f3d':'Roland GS sound bank + concert hall reverb. Piano, harp, flute, music box & more.',
+  't-f4t':'Dark/Light Adaptive','t-f4d':'Pure SF Symbol menu bar icon automatically matches your system appearance.',
+  't-f5t':'Menu Bar Native','t-f5d':'Lives in your menu bar, not your Dock. Countdown display, one-click pause, zero clutter.',
+  't-f6t':'Stats & Goals','t-f6d':'Daily break count and duration tracking, with a visual goal ring.',
+  't-f7t':'中文 / English','t-f7d':'Full bilingual localization — menu, settings, and break screen.',
+  't-f8t':'Quick Install','t-f8d':'Single DMG package, drag to Applications. Optional launch-at-login.',
+  't-s2':'Soundscapes','t-s2s':'All synthesized in real time using built-in macOS instruments. No extra files needed.',
+  't-s3':'Settings Preview',
+  't-m1':'Schedule','t-m2':'Theme','t-m3':'General','t-m4':'Stats',
+  't-dlt':'Download Sige','t-dlv':'v1.1 · macOS 14.0 Sonoma or later · Free',
+  't-dlb':'Download Sige-1.1.dmg',
+  't-dls':'Package Size','t-dlo':'Requirements','t-dlc':'Apple Silicon','t-dli':'Intel',
+  't-sum':'DMG Checksum',
+}};
+
+var L='zh';
+function S(l){
+  L=l;
+  var d=D[l];
+  for(var k in d){
+    var e=document.getElementById(k);
+    if(e) e.textContent=d[k];
+  }
+  document.getElementById('lzh').className=l==='zh'?'on':'';
+  document.getElementById('len').className=l==='en'?'on':'';
+  document.documentElement.lang=l==='zh'?'zh-CN':'en';
+}
+</script>
+</body>
+</html>
